@@ -9,7 +9,7 @@ public class Main {
         ParkingLot parkingLot = new ParkingLot();
 
         // Read the input file and parse cars by gates
-        Map<Integer, List<Car>> gateCarsMap = InputReader.readInputFile("input.txt", parkingLot);
+        Map<Integer, List<Car>> gateCarsMap = InputReader.readInputFile("input.txt", parkingLot , parkingSimulation);
 
         // Create threads for each gate
         Thread gate1 = new Thread(new Gate(1, gateCarsMap.getOrDefault(1, List.of())));

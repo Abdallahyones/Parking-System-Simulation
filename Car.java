@@ -1,6 +1,7 @@
 import java.util.Comparator;
 
 public class Car implements Runnable {
+    static boolean data = false;
     private final int id;
     private boolean parking ;
     public final int gate;
@@ -31,27 +32,29 @@ public class Car implements Runnable {
 
             parkingSimulation.add(this);
 
+            while (parkingLot.Wait(data)){}
+
             while (!parkingLot.parkingslot()) { // error
                 if (waiting == 0) {
                     System.out.println(toString() + " waiting for a spot.");
                 }
+                data = false;
                 Thread.sleep(1000);
                 waiting++;
+                while (parkingLot.Wait(data)){}
             }
-
             parkingLot.enterParking();
             if (waiting > 0) {
                 System.out.println(toString() + " parked after waiting for " + waiting + " units of time. (Parking Status:" + parkingLot.slot + " spots occupied)");
             } else {
                 System.out.println(toString() + " parked.(Parking Status:" + parkingLot.slot + " spots occupied)");
             }
-
-
+            data = false;
             Thread.sleep(parkingDuration * 1000);
-
+            while (parkingLot.Wait(data)){}
             parkingLot.leaveParking();
             System.out.println(toString() + " left after " + parkingDuration + " units of time. (Parking Status: " + parkingLot.slot + " spots occupied)");
-
+            data = false;
             parkingSimulation.leave(this);  // Remove the car from the waiting list
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -10,6 +10,11 @@ public class ParkingLot {
         slot = 0 ;
         totalCars = 0 ;
     }
+    public static boolean Wait(boolean data ){
+        boolean check = data ;
+        data = true;
+        return check ;
+    }
     public boolean parkingslot() {
         return slot < 4 ;
     }

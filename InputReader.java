@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 public class InputReader {
-    static public ParkingSimulation parkingSimulation;
-    InputReader(ParkingSimulation parkingSimulation){
-        this.parkingSimulation = parkingSimulation;
+    InputReader(){
     }
-    public static Map<Integer, List<Car>> readInputFile(String filename, ParkingLot parkingLot) {
+    public static Map<Integer, List<Car>> readInputFile(String filename, ParkingLot parkingLot , ParkingSimulation parkingSimulation) {
         Map<Integer, List<Car>> gateCarsMap = new HashMap<>();  // Map to store cars by gate
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {

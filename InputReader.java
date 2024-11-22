@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InputReader {
-    InputReader(){
-    }
-    public static Map<Integer, List<Car>> readInputFile(String filename, ParkingLot parkingLot , ParkingSimulation parkingSimulation) {
+    public static Map<Integer, List<Car>> readInputFile(String filename, ParkingLot parkingLot) {
         Map<Integer, List<Car>> gateCarsMap = new HashMap<>();  // Map to store cars by gate
 
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
@@ -28,7 +26,7 @@ public class InputReader {
                 int parkingDuration = Integer.parseInt(parts[3].split(" ")[1]);
 
                 // Create a new Car object
-                Car car = new Car(carId, gate, arrivalTime, parkingDuration, parkingLot , parkingSimulation );
+                Car car = new Car(carId, gate, arrivalTime, parkingDuration, parkingLot);
 
                 // Add the car to the appropriate gate list in the map
                 gateCarsMap.computeIfAbsent(gate, k -> new ArrayList<>()).add(car);

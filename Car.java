@@ -1,80 +1,49 @@
-import java.util.Comparator;
-
 public class Car implements Runnable {
-    static boolean data = false;
     private final int id;
-    private boolean parking ;
-    public final int gate;
-    public final int arrivalTime ;
-
+    private final int gate;
+    private final int arrivalTime;
     private final int parkingDuration;
     private final ParkingLot parkingLot;
-    private final ParkingSimulation parkingSimulation;
-    private int waiting ;
 
-    public Car(int id, int gate, int arrivalTime, int parkingDuration, ParkingLot parkingLot, ParkingSimulation parkingSimulation) {
+    public Car(int id, int gate, int arrivalTime, int parkingDuration, ParkingLot parkingLot) {
         this.id = id;
         this.gate = gate;
         this.arrivalTime = arrivalTime;
         this.parkingDuration = parkingDuration;
         this.parkingLot = parkingLot;
-        this.parkingSimulation = parkingSimulation;
-        this.parking = false;
-        this.waiting = 0 ;
     }
 
     @Override
     public void run() {
         try {
-
+            // Simulate arrival time
             Thread.sleep(arrivalTime * 1000);
-            System.out.println(toString() + " arrived at time " + arrivalTime);
+            System.out.println("Car " + id + " from Gate " + gate + " arrived at time " + arrivalTime);
 
-            parkingSimulation.add(this);
+            long waitingStartTime = System.currentTimeMillis(); // Record the waiting start time
 
-            while (parkingLot.Wait(data)){}
-
-            while (!parkingLot.parkingslot()) { // error
-                if (waiting == 0) {
-                    System.out.println(toString() + " waiting for a spot.");
-                }
-                data = false;
-                Thread.sleep(1000);
-                waiting++;
-                while (parkingLot.Wait(data)){}
-            }
-            parkingLot.enterParking();
-            if (waiting > 0) {
-                System.out.println(toString() + " parked after waiting for " + waiting + " units of time. (Parking Status:" + parkingLot.slot + " spots occupied)");
+            // Try to acquire a parking spot
+            if (parkingLot.tryPark()) {
+                System.out.println("Car " + id + " from Gate " + gate + " parked immediately. (Parking Status: " +
+                        parkingLot.getCurrentCarsInParking() + " spots occupied)");
             } else {
-                System.out.println(toString() + " parked.(Parking Status:" + parkingLot.slot + " spots occupied)");
+                System.out.println("Car " + id + " from Gate " + gate + " waiting for a spot.");
+                parkingLot.park(); // Wait for a spot to become available
+                long waitingTime = (System.currentTimeMillis() - waitingStartTime) / 1000; // Calculate waiting time
+                if (waitingTime > 0)
+                    System.out.println("Car " + id + " from Gate " + gate + " parked after waiting " + waitingTime +
+                            " seconds. (Parking Status: " + parkingLot.getCurrentCarsInParking() + " spots occupied)");
+                else
+                    System.out.println("Car " + id + " from Gate " + gate +
+                            " (Parking Status: " + parkingLot.getCurrentCarsInParking() + " spots occupied)");
             }
-            data = false;
-            Thread.sleep(parkingDuration * 1000);
-            while (parkingLot.Wait(data)){}
-            parkingLot.leaveParking();
-            System.out.println(toString() + " left after " + parkingDuration + " units of time. (Parking Status: " + parkingLot.slot + " spots occupied)");
-            data = false;
-            parkingSimulation.leave(this);  // Remove the car from the waiting list
+
+            Thread.sleep(parkingDuration * 1000); // Simulate parking duration
+            parkingLot.leave();
+            System.out.println("Car " + id + " from Gate " + gate + " left after " + parkingDuration +
+                    " units of time. (Parking Status: " + parkingLot.getCurrentCarsInParking() + " spots occupied)");
         } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Car " + id + " from Gate " + gate;
-    }
-}
-
-class CarComparator implements Comparator<Car> {
-    @Override
-    public int compare(Car p1, Car p2) {
-        if (p1.arrivalTime != p2.arrivalTime) {
-            return Integer.compare(p1.arrivalTime, p2.arrivalTime);
-        } else {
-            return Integer.compare(p1.gate, p2.gate);
+            Thread.currentThread().interrupt();
         }
     }
 }
-

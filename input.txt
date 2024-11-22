@@ -4,5 +4,3 @@ Gate 1, Car 3, Arrive 0, Parks 2
 Gate 1, Car 4, Arrive 0, Parks 2
 Gate 1, Car 5, Arrive 1, Parks 2
 Gate 3, Car 6, Arrive 2, Parks 3
-
-3 3 2 2

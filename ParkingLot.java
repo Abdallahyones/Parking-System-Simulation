@@ -1,32 +1,32 @@
-import java.util.concurrent.Semaphore;
-
 public class ParkingLot {
-    private final Semaphore spots;
+    private final Spots spots;
     private final int totalSpots;
     private int totalCarsServed = 0;
 
     public ParkingLot(int totalSpots) {
         this.totalSpots = totalSpots;
-        this.spots = new Semaphore(totalSpots, true); // 4 slots
-    }
-    public boolean tryPark() {
-        return spots.tryAcquire();
+        this.spots = new Spots(totalSpots);
     }
 
-    public void park() {
+    public synchronized boolean tryPark(Car A) {
+        if (spots.availablePermits() > 0) {
+            spots.acquireUnchecked(A);
+            return true;
+        }
+        return false;
+    }
+
+    public void park(Car A) {
         try {
-            spots.acquire(); // Acquire a parking spot
-//            synchronized (this) {
-//                totalCarsServed++;
-//            }
+            spots.acquire(A); // Wait for a spot to become available
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
-    public void leave() {
+    public void leave(Car A) {
         totalCarsServed++;
-        spots.release(); // Release a parking spot
+        spots.release(A); // Release a parking spot and notify waiting cars
     }
 
     public synchronized int getTotalCarsServed() {
